@@ -87,8 +87,8 @@ app.get("/movies/:id", (request, response) => {
 //Fetch a movie according to its score and limit the search result
 app.get("/movies/search/:limit/:metascore", (request, response) => {
   collection.find(
-    { metascore: { $gte: request.params.metascore  } }
-  ).limit(parseInt(request.params.limit)).toArray((error, result) => {
+    { metascore: { $gte: Number(request.params.metascore)  } }
+  ).limit(Number(request.params.limit)).toArray((error, result) => {
     if (error) {
       return response.status(500).send(error);
     }
