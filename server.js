@@ -1,22 +1,22 @@
-var { graphql, buildSchema } = require('graphql');
-const imdb = require("./src/imdb.js")
-const DENZEL_IMDB_ID = 'nm0000243';
+//get all the libraries needed
+const express = require('express');
+const graphqlHTTP = require('express-graphql');
+const {GraphQLSchema} = require('graphql');
 
-// Construct a schema, using GraphQL schema language
-var schema = buildSchema(`
-  type Query {
-    hello: String
-  }
-`);
+const {queryType} = require('./src/query.js');
 
-// The root provides a resolver function for each API endpoint
-var root = {
-  hello: () => {
-    return 'Hello world!';
-  },
-};
+//setting up the port number and express app
+const port = 9292;
+const app = express();
 
-// Run the GraphQL query '{ hello }' and print out the response
-graphql(schema, '{ hello }', root).then((response) => {
-  console.log(response);
-});
+ // Define the Schema
+const schema = new GraphQLSchema({ query: queryType });
+
+//Setup the nodejs GraphQL server
+app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    graphiql: true,
+}));
+
+app.listen(port);
+console.log(`GraphQL Server Running at localhost:${port}`);
