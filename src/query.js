@@ -69,7 +69,7 @@ const queryType = new GraphQLObjectType({
           },
           resolve: async function(source, args){
             var idd = { id: args.id }
-            var res = await collection.find(idd);
+            var res = await collection.findOne(idd);
             return res;
           }
         },
