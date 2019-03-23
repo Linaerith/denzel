@@ -1,14 +1,19 @@
 //Setting GraphQL
 const { GraphQLObjectType,
     GraphQLString,
-    GraphQLInt
+    GraphQLInt,
+    GraphQLList
 } = require('graphql');
 const _ = require('lodash');
 
-const {movieType} = require('./src/types.js');
+const {movieType} = require('./types.js');
 
 //Setting MongoDB
-const imdb = require("./src/imdb.js")
+const BodyParser = require("body-parser");
+const MongoClient = require("mongodb").MongoClient;
+const ObjectId = require("mongodb").ObjectID;
+const Express = require('express');
+const imdb = require("./imdb.js")
 const DENZEL_IMDB_ID = 'nm0000243';
 
 
@@ -22,7 +27,7 @@ app.use(BodyParser.urlencoded({ extended: true }));
 
 var database, collection;
 
-app.listen(9292, () => {
+app.listen(5000, () => {
     MongoClient.connect(CONNECTION_URL, { useNewUrlParser: true }, (error, client) => {
         if(error) {
             throw error;
@@ -50,10 +55,7 @@ const queryType = new GraphQLObjectType({
 
         fetchRandomMovie: {
             type: movieType,
-            args: {
-                id: { type: GraphQLString }
-            },
-            resolve: async function (source, args) {
+            resolve: async function () {
               var res =  await collection.aggregate([{
                 $match: {   "metascore": { $gt: 70 } } },
                 { $sample: {   size: 1   } }]).toArray();
@@ -66,7 +68,8 @@ const queryType = new GraphQLObjectType({
             id: {type: GraphQLString}
           },
           resolve: async function(source, args){
-            var res = await collection.findOne({ id: args.id });
+            var idd = { id: args.id }
+            var res = await collection.find(idd);
             return res;
           }
         },
